@@ -46,3 +46,17 @@ def get_two_colors(image_url, distinct_threshold=60):
             break
 
     return primary, secondary
+
+
+def to_hex_color(rgb_color: tuple) -> str:
+    return "#%02x%02x%02x" % rgb_color
+
+
+def get_mixed_color(color1, color2, first_color_percentage):
+    first_color_percentage = max(0.0, min(1.0, first_color_percentage))
+    second_color_percentage = 1.0 - first_color_percentage
+
+    return tuple(
+        int(color1[i] * first_color_percentage + color2[i] * second_color_percentage)
+        for i in range(3)
+    )

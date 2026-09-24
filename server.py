@@ -4,7 +4,7 @@ from threading import Thread
 import requests
 
 from metronome import ColorMetronome
-from color_output import Window
+from color_output.window import Window
 from color_util import get_two_colors
 from spotify.spotify import getCurrentSong
 
