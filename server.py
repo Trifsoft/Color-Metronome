@@ -5,6 +5,8 @@ import requests
 
 from metronome import ColorMetronome
 from color_output.window import Window
+from color_output.tuya import TuyaBulb
+from color_output.combined import CombinedColorOutput
 from color_util import get_two_colors
 from spotify.spotify import getCurrentSong
 
@@ -12,7 +14,7 @@ default_first = (255, 0, 0)
 default_second = (0, 0, 0)
 
 metronome = ColorMetronome()
-window = None
+window = CombinedColorOutput([Window(), TuyaBulb("bf2508223f64b1521chzxt", "192.168.1.24", "dIIy3N_&gr/&Q-UH", "3.5")])
 
 def get_audio_data(spotify_id: str):
     """Returns audio data from ReccoBeats."""
@@ -34,7 +36,9 @@ def get_audio_data(spotify_id: str):
 def start_metronome():
     global window
     if window is not None:
+        print("Running metronome")
         metronome.run(window)
+        print("Finished")
 
 
 def update_songs():
@@ -73,7 +77,6 @@ def update_songs():
 
 
 if __name__ == "__main__":
-    window = Window()
     spotify_thread = Thread(target=update_songs, daemon=True)
     spotify_thread.start()
     start_metronome()
