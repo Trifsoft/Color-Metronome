@@ -10,6 +10,8 @@ from spotify.spotify import getCurrentSong
 
 from pulse.pulse import get_pulse_from_spotify_id
 
+from song_socket.spotify import SpotifyPollingSocket
+
 default_first = (255, 0, 0)
 default_second = (0, 0, 0)
 
@@ -49,8 +51,23 @@ def update_songs():
                 metronome.set_delay(track["current_ms"])
             time.sleep(1)
 
+def update_play(is_playing, delay):
+    metronome.set_playing(is_playing)
+    metronome.set_delay(delay)
+
+def update_song(song):
+    if song.get("album") is not None and song["album"].get("images"):
+        first, second = get_two_colors(song["album"]["images"][0])
+    else:
+        first, second = default_first, default_second
+    metronome.set_colors(first=first, second=second)
+    metronome.set_pulse(get_pulse_from_spotify_id(song["id"]))
 
 if __name__ == "__main__":
-    spotify_thread = Thread(target=update_songs, daemon=True)
-    spotify_thread.start()
+    # spotify_thread = Thread(target=update_songs, daemon=True)
+    # spotify_thread.start()
+    spotify_socket = SpotifyPollingSocket()
+    spotify_socket.add_on_play_callback(update_play)
+    spotify_socket.add_on_song_played_callback(update_song)
+    spotify_socket.run()
     start_metronome()

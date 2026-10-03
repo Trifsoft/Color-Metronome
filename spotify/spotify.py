@@ -24,7 +24,7 @@ def _request_token_via_refresh(refresh_token):
     return resp.json()
 
 
-def get_access_token():
+def _get_access_token():
     """
     Returns a valid access token, refreshing or re-authorizing only when needed.
     Caches in memory for the process lifetime; caches refresh_token on disk.
@@ -44,9 +44,9 @@ def get_access_token():
     return access_token
 
 
-def make_call(method, endpoint, return_response = True, **kwargs):
+def _make_call(method, endpoint, return_response = True, **kwargs):
     url = f"https://api.spotify.com/v1{endpoint}"
-    headers = {"Authorization": f"Bearer {get_access_token()}"}
+    headers = {"Authorization": f"Bearer {_get_access_token()}"}
 
     resp = requests.request(method, url, headers=headers, **kwargs)
     resp.raise_for_status()
@@ -57,26 +57,26 @@ def make_call(method, endpoint, return_response = True, **kwargs):
 
 # ------- PARSING -------
 
-def get_artist(artist):
+def _get_artist(artist):
     return {
         "id": artist["id"],
         "name": artist["name"]
     }
 
-def get_album(album):
+def _get_album(album):
     return {
         "name": album["name"],
-        "artists": [get_artist(artist) for artist in album["artists"]],
+        "artists": [_get_artist(artist) for artist in album["artists"]],
         "id": album["id"],
         "images": [image["url"] for image in album["images"]]
     }
 
-def get_track(track):
+def _get_track(track):
     return {
         "name": track["name"],
         "id": track["id"],
-        "album": get_album(track["album"]),
-        "artists": [get_artist(artist) for artist in track["artists"]],
+        "album": _get_album(track["album"]),
+        "artists": [_get_artist(artist) for artist in track["artists"]],
         "duration_ms": track["duration_ms"]
     }
 
@@ -87,10 +87,10 @@ def getCurrentSong():
     Returns song info if something is playing,
     or None if nothing is playing.
     """
-    resp = make_call("GET", "/me/player/currently-playing")
+    resp = _make_call("GET", "/me/player/currently-playing")
 
     if resp is not None:
-        track = get_track(resp["item"])
+        track = _get_track(resp["item"])
         track["current_ms"] = resp["progress_ms"]
         track["is_playing"] = resp["is_playing"]
         return track

@@ -10,5 +10,5 @@ class EnergyPulse(Pulse):
     def evaluate(self, s):
         """f(x_ms): interpolated, normalized (0-1) energy at time x_ms milliseconds."""
         raw = np.interp(s, self._times_ms, self._energy)
-        print(s, raw)
+        # print(s, raw)
         return raw / 255.0
